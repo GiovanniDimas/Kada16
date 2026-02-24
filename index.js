@@ -29,7 +29,7 @@ app.get('/halo/:greeting', (req, res) => {
 });
 
 app.get('/along', (req, res) => {
-  res.status(401).send('Kumaha damang?');
+  res.status(401).send('Tidak bisa akses!');
 });
 
 app.listen(3000, () => {
