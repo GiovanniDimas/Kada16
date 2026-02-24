@@ -28,6 +28,10 @@ app.get('/halo/:greeting', (req, res) => {
   res.send(`Hello ${greeting}!`);
 });
 
+app.get('/along', (req, res) => {
+  res.send('Kumaha damang?');
+});
+
 app.listen(3000, () => {
   console.log('Server running at http://localhost:3000');
 });
