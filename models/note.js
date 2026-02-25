@@ -1,6 +1,6 @@
 let notes = [
   {
-    id: 121,
+    id: 1,
     title: "Hanoman",
     content: "Legendary monkey god in Hindu mythology",
   },
