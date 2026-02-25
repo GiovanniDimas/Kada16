@@ -1,4 +1,5 @@
 import express from 'express';
+import notesRouter from './routes/notes.js';
 
 const app = express();
 
@@ -34,4 +35,24 @@ app.get('/along', (req, res) => {
 
 app.listen(3000, () => {
   console.log('Server running at http://localhost:3000');
+});
+
+app.use(express.json());
+
+app.use('/notes', notesRouter);
+
+app.use((err, req, res, next) => {
+  res.status(500);
+  res.json({
+    result: 'fail',
+    error: err.message,
+  });
+});
+
+app.use((req, res, next) => {
+  res.status(404);
+  res.send({
+    result: 'fail',
+    error: `Page not found ${req.path}`,
+  });
 });
