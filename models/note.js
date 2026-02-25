@@ -1,8 +1,8 @@
 let notes = [
   {
-    id: 1,
-    title: "first note",
-    content: "My first note is here.",
+    id: 121,
+    title: "Hanoman",
+    content: "Legendary monkey god in Hindu mythology",
   },
 ];
 
