@@ -9,40 +9,6 @@ router.get("/", (req, res, next) => {
   res.json(notes);
 });
 
-router.get("/:id", (req, res, next) => {
-  const id = Number(req.params.id);
-
-  try {
-    const note = Note.get(id);
-    res.json(note);
-  } catch (e) {
-    next(e);
-  }
-});
-
-router.get("/:id", async (req, res) => {
-  try{
-   const { id } = req.params;
-   const note = await Post.findById(id);
-
-  if (!note) {
-    return res.status(404).json({
-      error: "Catatan tidak ditemukan",
-      message: `Tidak ada catatan dengan ID ${id}`
-    });
-  }
-
-  res.status(200).json(note);
-
-  } catch (error) {
-  console.error("Error Detail:", error.message);
-  res.status(500).json({
-    error: "Terjadi kesalahan saat mengambil catatan",
-    details: error.message
-  });
-  }
-});
-
 router.post("/", async (req, res, next) => {
   const { title, content } = req.body;
   
