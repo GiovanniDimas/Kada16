@@ -35,6 +35,8 @@ app.get('/along', (req, res) => {
   res.status(401).send('Tidak bisa akses!');
 });
 
+mongoose.connect("mongodb://localhost:27017/myapp");
+
 app.listen(3000, () => {
   console.log('Server running at http://localhost:3000');
 });
@@ -59,4 +61,3 @@ app.use((req, res, next) => {
   });
 });
 
-mongoose.connect("mongodb://localhost:27017/myapp");
