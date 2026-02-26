@@ -35,12 +35,12 @@ app.get('/along', (req, res) => {
   res.status(401).send('Tidak bisa akses!');
 });
 
-mongoose.connect("mongodb+srv://giovannidimas32_db_user:McLaren04@cluster0.zzvssed.mongodb.net/?appName=Cluster0");
+const cloudURI = "mongodb+srv://giovannidimas32_db_user:McLaren04@cluster0.zzvssed.mongodb.net/?appName=Cluster0";
 
 mongoose.connect(cloudURI)
   .then(() => console.log('Connected to MongoDB!'))
   .catch((err) => console.error('Failed to connect to MongoDB:', err));
-  
+
 app.listen(3000, () => {
   console.log('Server running at http://localhost:3000');
 });
