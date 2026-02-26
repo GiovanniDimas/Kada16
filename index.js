@@ -18,6 +18,8 @@ app.use((req,res,next)=> {
   next();
 }) 
 
+app.use(cors({origin: "*" }));
+
 app.use((err,req,res,next) => {
   res.send('Error Occured');
 })
