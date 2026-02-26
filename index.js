@@ -50,11 +50,8 @@ app.use(express.json());
 app.use('/notes', notesRouter);
 
 app.use((err, req, res, next) => {
-  res.status(500);
-  res.json({
-    result: 'fail',
-    error: err.message,
-  });
+  console.log('Error:', err.message);
+  res.status(500).send('Error Occurred');
 });
 
 app.use((req, res, next) => {
