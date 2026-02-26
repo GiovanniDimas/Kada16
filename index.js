@@ -1,5 +1,7 @@
 import express from 'express';
 import notesRouter from './routes/notes.js';
+import mongoose from "mongoose";
+import { Post } from "./models/index.js";
 
 const app = express();
 
@@ -56,3 +58,5 @@ app.use((req, res, next) => {
     error: `Page not found ${req.path}`,
   });
 });
+
+mongoose.connect("mongodb://localhost:27017/myapp");
