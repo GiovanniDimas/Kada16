@@ -2,6 +2,7 @@ import express from 'express';
 import notesRouter from './routes/notes.js';
 import mongoose from "mongoose";
 import { Post } from "./models/index.js";
+import cors from "cors";
 
 const app = express();
 
@@ -17,8 +18,6 @@ app.use((req,res,next)=> {
   }
   next();
 }) 
-
-app.use(cors({origin: "*" }));
 
 app.use((err,req,res,next) => {
   res.send('Error Occured');
@@ -42,6 +41,11 @@ const cloudURI = "mongodb+srv://giovannidimas32_db_user:McLaren04@cluster0.zzvss
 mongoose.connect(cloudURI)
   .then(() => console.log('Connected to MongoDB!'))
   .catch((err) => console.error('Failed to connect to MongoDB:', err));
+
+app.use(cors({ origin: '*', methods: ['GET', 'POST', 'PUT', 'DELETE'], allowedHeaders: ['Content-Type', 'Authorization'] }));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use('/notes', notesRouter);  
 
 app.listen(3000, () => {
   console.log('Server running at http://localhost:3000');
