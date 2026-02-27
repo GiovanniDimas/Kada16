@@ -16,6 +16,7 @@ await mongoose.connect(cloudURI)
     process.exit(1);
   }
 }
+connectDb();
 
 const app = express();
 
