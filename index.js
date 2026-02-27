@@ -1,11 +1,10 @@
 import express from 'express';
 import notesRouter from './routes/notes.js';
 import mongoose from "mongoose";
-import { Post } from "./models/index.js";
 import cors from "cors";
 
-// const cloudURI = "mongodb+srv://giovannidimas32_db_user:McLaren04@cluster0.zzvssed.mongodb.net/?appName=Cluster0";
-const cloudURI = "mongodb://giovannidimas32_db_user:McLaren04@cluster0-shard-00-00.zzvssed.mongodb.net:27017,cluster0-shard-00-01.zzvssed.mongodb.net:27017,cluster0-shard-00-02.zzvssed.mongodb.net:27017/notes_db?ssl=true&replicaSet=atlas-14s5m7-shard-0&authSource=admin&retryWrites=true&w=majority";
+const cloudURI = "mongodb+srv://giovannidimas32_db_user:McLaren04@cluster0.zzvssed.mongodb.net/?appName=Cluster0";
+// const cloudURI = "mongodb://giovannidimas32_db_user:McLaren04@cluster0-shard-00-00.zzvssed.mongodb.net:27017,cluster0-shard-00-01.zzvssed.mongodb.net:27017,cluster0-shard-00-02.zzvssed.mongodb.net:27017/notes_db?ssl=true&replicaSet=atlas-14s5m7-shard-0&authSource=admin&retryWrites=true&w=majority";
 
 mongoose.connect(cloudURI)
   .then(() => console.log('Connected to MongoDB!'))
