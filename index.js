@@ -4,7 +4,8 @@ import mongoose from "mongoose";
 import { Post } from "./models/index.js";
 import cors from "cors";
 
-const cloudURI = "mongodb+srv://giovannidimas32_db_user:McLaren04@cluster0.zzvssed.mongodb.net/?appName=Cluster0";
+// const cloudURI = "mongodb+srv://giovannidimas32_db_user:McLaren04@cluster0.zzvssed.mongodb.net/?appName=Cluster0";
+const cloudURI = "mongodb://giovannidimas32_db_user:McLaren04@cluster0-shard-00-00.zzvssed.mongodb.net:27017,cluster0-shard-00-01.zzvssed.mongodb.net:27017,cluster0-shard-00-02.zzvssed.mongodb.net:27017/notes_db?ssl=true&replicaSet=atlas-14s5m7-shard-0&authSource=admin&retryWrites=true&w=majority";
 
 mongoose.connect(cloudURI)
   .then(() => console.log('Connected to MongoDB!'))
@@ -14,25 +15,25 @@ const app = express();
 
 app.use(express.json());
 app.use(cors({ origin: '*', methods: ['GET', 'POST', 'PUT', 'DELETE'], allowedHeaders: ['Content-Type', 'Authorization'] }));
-app.use(express.urlencoded({ extended: true }));
+// app.use(express.urlencoded({ extended: true }));
 app.use('/notes', notesRouter);  
 
-app.use((req,res,next) => {
-  console.log(`Request ${req.path}`);
-  next();
-})
+// app.use((req,res,next) => {
+//   console.log(`Request ${req.path}`);
+//   next();
+// })
 
-app.use((req,res,next)=> {
-  if(false){
-    next(new Error('Not Authorized'));
-    return;
-  }
-  next();
-}) 
+// app.use((req,res,next)=> {
+//   if(false){
+//     next(new Error('Not Authorized'));
+//     return;
+//   }
+//   next();
+// }) 
 
-app.use((err,req,res,next) => {
-  res.send('Error Occured');
-})
+// app.use((err,req,res,next) => {
+//   res.send('Error Occured');
+// })
 
 // app.get('/', (req, res) => {
 //   res.send('Hello Dimas!');
