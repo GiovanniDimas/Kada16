@@ -46,7 +46,6 @@ router.post("/", async (req, res, next) => {
   }
     
   try {
-  //const note = Note.create(title, content);
   const note = await Post.create({
 
     author: author,
