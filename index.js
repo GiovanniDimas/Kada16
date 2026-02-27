@@ -4,11 +4,17 @@ import mongoose from "mongoose";
 import cors from "cors";
 
 // const cloudURI = "mongodb+srv://giovannidimas32_db_user:McLaren04@cluster0.zzvssed.mongodb.net/?appName=Cluster0";
-const cloudURI = "mongodb://giovannidimas32_db_user:McLaren04@cluster0-shard-00-00.zzvssed.mongodb.net:27017,cluster0-shard-00-01.zzvssed.mongodb.net:27017,cluster0-shard-00-02.zzvssed.mongodb.net:27017/notes_db?ssl=true&replicaSet=atlas-14s5m7-shard-0&authSource=admin&retryWrites=true&w=majority";
+const connectDb = async()=>{
+  try{
+const cloudURI = "mongodb://giovannidimas32_db_user:McLaren04@ac-r8cngqi-shard-00-00.zzvssed.mongodb.net:27017,ac-r8cngqi-shard-00-01.zzvssed.mongodb.net:27017,ac-r8cngqi-shard-00-02.zzvssed.mongodb.net:27017/notes_db?ssl=true&replicaSet=atlas-yc9v1f-shard-0&authSource=admin&retryWrites=true&w=majority";
 
-mongoose.connect(cloudURI)
+await mongoose.connect(cloudURI)
   .then(() => console.log('Connected to MongoDB!'))
   .catch((err) => console.error('Failed to connect to MongoDB:', err));
+  }catch(e){
+    console.error('error connecting to mongodb');
+  }
+}
 
 const app = express();
 
