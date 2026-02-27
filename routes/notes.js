@@ -37,17 +37,19 @@ router.get("/:id", async (req, res) => {
 });
 
 router.post("/", async (req, res, next) => {
-  const { title, content } = req.body;
+  const {author, title, content } = req.body;
   
-  if (!title || !content) {
+  if (!author || !title || !content) {
     return res.status(400).json({
-      message: "Title and content are required",
+      message: "Author, title, and content are required",
     })
   }
     
   try {
   //const note = Note.create(title, content);
   const note = await Post.create({
+
+    author: author,
     title: title,
     content: content,
   });
@@ -60,10 +62,10 @@ router.post("/", async (req, res, next) => {
 
 router.put("/:id", (req, res, next) => {
   const id = Number(req.params.id);
-  const { title, content } = req.body;
+  const { author, title, content } = req.body;
 
   try {
-    const note = Note.update(id, title, content);
+    const note = Note.update(id, author, title, content);
     res.json(note);
   } catch (e) {
     next(e);
@@ -75,7 +77,7 @@ router.put("/:id", async (req, res, next) => {
     const { id } = req.params;
     const { title, content } = req.body;
     try {
-        const updatedNote = await Post.findByIdAndUpdate(id, { title, content }, { new: true });
+        const updatedNote = await Post.findByIdAndUpdate(id, { author, title, content }, { new: true });
         if (!updatedNote) {
             return res.status(404).json({ error: "Note not found" });
         }
