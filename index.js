@@ -4,7 +4,18 @@ import mongoose from "mongoose";
 import { Post } from "./models/index.js";
 import cors from "cors";
 
+const cloudURI = "mongodb+srv://giovannidimas32_db_user:McLaren04@cluster0.zzvssed.mongodb.net/?appName=Cluster0";
+
+mongoose.connect(cloudURI)
+  .then(() => console.log('Connected to MongoDB!'))
+  .catch((err) => console.error('Failed to connect to MongoDB:', err));
+
 const app = express();
+
+app.use(express.json());
+app.use(cors({ origin: '*', methods: ['GET', 'POST', 'PUT', 'DELETE'], allowedHeaders: ['Content-Type', 'Authorization'] }));
+app.use(express.urlencoded({ extended: true }));
+app.use('/notes', notesRouter);  
 
 app.use((req,res,next) => {
   console.log(`Request ${req.path}`);
@@ -23,37 +34,18 @@ app.use((err,req,res,next) => {
   res.send('Error Occured');
 })
 
-app.get('/', (req, res) => {
-  res.send('Hello Dimas!');
-});
+// app.get('/', (req, res) => {
+//   res.send('Hello Dimas!');
+// });
 
-app.get('/halo/:greeting', (req, res) => {
-  const { greeting } = req.params;
-  res.send(`Hello ${greeting}!`);
-});
+// app.get('/halo/:greeting', (req, res) => {
+//   const { greeting } = req.params;
+//   res.send(`Hello ${greeting}!`);
+// });
 
-app.get('/along', (req, res) => {
-  res.status(401).send('Tidak bisa akses!');
-});
-
-const cloudURI = "mongodb+srv://giovannidimas32_db_user:McLaren04@cluster0.zzvssed.mongodb.net/?appName=Cluster0";
-
-mongoose.connect(cloudURI)
-  .then(() => console.log('Connected to MongoDB!'))
-  .catch((err) => console.error('Failed to connect to MongoDB:', err));
-
-app.use(cors({ origin: '*', methods: ['GET', 'POST', 'PUT', 'DELETE'], allowedHeaders: ['Content-Type', 'Authorization'] }));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use('/notes', notesRouter);  
-
-app.listen(3000, () => {
-  console.log('Server running at http://localhost:3000');
-});
-
-app.use(express.json());
-
-app.use('/notes', notesRouter);
+// app.get('/along', (req, res) => {
+//   res.status(401).send('Tidak bisa akses!');
+// });
 
 app.use((err, req, res, next) => {
   console.log('Error:', err.message);
@@ -68,3 +60,6 @@ app.use((req, res, next) => {
   });
 });
 
+app.listen(3000, () => {
+  console.log('Server running at http://localhost:3000');
+});
