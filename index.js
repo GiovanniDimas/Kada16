@@ -12,7 +12,8 @@ await mongoose.connect(cloudURI)
   .then(() => console.log('Connected to MongoDB!'))
   .catch((err) => console.error('Failed to connect to MongoDB:', err));
   }catch(e){
-    console.error('error connecting to mongodb');
+    console.error('error connecting to mongodb',e.message);
+    process.exit(1);
   }
 }
 
