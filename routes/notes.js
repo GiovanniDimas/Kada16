@@ -59,18 +59,6 @@ router.post("/", async (req, res, next) => {
   }
 });
 
-router.put("/:id", (req, res, next) => {
-  const id = Number(req.params.id);
-  const { author, title, content } = req.body;
-
-  try {
-    const note = Note.update(id, author, title, content);
-    res.json(note);
-  } catch (e) {
-    next(e);
-  }
-}); 
-
 router.put("/:id", async (req, res, next) => {
   
     const { id } = req.params;
@@ -84,17 +72,6 @@ router.put("/:id", async (req, res, next) => {
     } catch (err) {
         next(err);
     }
-});
-
-router.delete("/:id", (req, res, next) => {
-  const id = Number(req.params.id);
-
-  try {
-    Note.remove(id);
-    res.json({ result: "success" });
-  } catch (e) {
-    next(e);
-  }
 });
 
 router.delete("/:id", async (req, res, next) => {
