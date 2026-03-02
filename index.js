@@ -2,6 +2,8 @@ import express from 'express';
 import notesRouter from './routes/notes.js';
 import mongoose from "mongoose";
 import cors from "cors";
+import bcrypt from 'bcryptjs';
+import auth from './routes/auth.js';
 
 const cloudURI = "mongodb+srv://giovannidimas32_db_user:McLaren04@cluster0.zzvssed.mongodb.net/?appName=Cluster0";
 const connectDb = async()=>{
@@ -24,7 +26,7 @@ app.use(express.json());
 app.use(cors({ origin: '*', methods: ['GET', 'POST', 'PUT', 'DELETE'], allowedHeaders: ['Content-Type', 'Authorization'] }));
 // app.use(express.urlencoded({ extended: true }));
 app.use('/notes', notesRouter);  
-
+app.use('/auth', auth);
 // app.use((req,res,next) => {
 //   console.log(`Request ${req.path}`);
 //   next();
