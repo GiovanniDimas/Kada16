@@ -1,36 +1,56 @@
 import express from 'express';
+import mongoose from 'mongoose';
+import cors from 'cors';
+import dotenv from 'dotenv';
 import notesRouter from './routes/notes.js';
-import mongoose from "mongoose";
-import cors from "cors";
-import auth from './routes/auth.js';
+import authRouter from './routes/auth.js';
 
-const cloudURI = "mongodb://giovannidimas32_db_user:McLaren04@cluster0-shard-00-00.zzvssed.mongodb.net:27017,cluster0-shard-00-01.zzvssed.mongodb.net:27017,cluster0-shard-00-02.zzvssed.mongodb.net:27017/?ssl=true&replicaSet=atlas-xxxx&authSource=admin&retryWrites=true&w=majority";
-
-const connectDb = async () => {
-  try {
-    await mongoose.connect(cloudURI, {
-      serverSelectionTimeoutMS: 5000,
-    });
-    console.log('✅ Connected to MongoDB');
-  } catch (e) {
-    console.error('❌ MongoDB connection error:', e.message);
-    process.exit(1);
-  }
-};
-
-connectDb();
+dotenv.config();
 
 const app = express();
+const PORT = process.env.PORT || 3000;
+const MONGO_URI = process.env.MONGO_URI;
+
+let isConnected = false;
+
+async function connectDb() {
+  if (isConnected) return;
+
+  try {
+    await mongoose.connect(MONGO_URI, {
+      serverSelectionTimeoutMS: 5000,
+    });
+    isConnected = true;
+    console.log('✅ MongoDB Connected');
+  } catch (err) {
+    console.error('❌ MongoDB Error:', err.message);
+    throw err;
+  }
+}
+
+app.use(async (req, res, next) => {
+  try {
+    await connectDb();
+    next();
+  } catch (err) {
+    res.status(500).json({
+      error: 'Database connection failed',
+      message: err.message,
+    });
+  }
+});
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors({ origin: "*" }));
+app.use(cors());
 
-app.use('/notes', notesRouter);  
-app.use('/auth', auth);
-
-app.listen(3000, () => {
-  console.log('🚀 Server running at http://localhost:3000');
+app.get('/', (req, res) => {
+  res.send('🔥 API Running');
 });
 
-export default app;
+app.use('/notes', notesRouter);
+app.use('/auth', authRouter);
+
+app.listen(PORT, () => {
+  console.log(`🚀 Server running at http://localhost:${PORT}`);
+});
