@@ -4,18 +4,19 @@ import mongoose from "mongoose";
 import cors from "cors";
 import auth from './routes/auth.js';
 
-const cloudURI = "mongodb+srv://giovannidimas32_db_user:McLaren04@cluster0.zzvssed.mongodb.net/?appName=Cluster0";
-const connectDb = async()=>{
-  try{
+const cloudURI = "mongodb://giovannidimas32_db_user:McLaren04@cluster0-shard-00-00.zzvssed.mongodb.net:27017,cluster0-shard-00-01.zzvssed.mongodb.net:27017,cluster0-shard-00-02.zzvssed.mongodb.net:27017/?ssl=true&replicaSet=atlas-xxxx&authSource=admin&retryWrites=true&w=majority";
 
-await mongoose.connect(cloudURI)
-  .then(() => console.log('Connected to MongoDB!'))
-  .catch((err) => console.error('Failed to connect to MongoDB:', err));
-  }catch(e){
-    console.error('error connecting to mongodb',e.message);
+const connectDb = async () => {
+  try {
+    await mongoose.connect(cloudURI, {
+      serverSelectionTimeoutMS: 5000,
+    });
+    console.log('✅ Connected to MongoDB');
+  } catch (e) {
+    console.error('❌ MongoDB connection error:', e.message);
     process.exit(1);
   }
-}
+};
 
 connectDb();
 
@@ -23,26 +24,13 @@ const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors({ origin: '*', methods: ['GET', 'POST', 'PUT', 'DELETE'], allowedHeaders: ['Content-Type', 'Authorization'] }));
+app.use(cors());
 
 app.use('/notes', notesRouter);  
 app.use('/auth', auth);
 
-app.use((err, req, res, next) => {
-  console.log('Error:', err.message);
-  res.status(500).send('Error Occurred');
-});
-
-app.use((req, res, next) => {
-  res.status(404);
-  res.send({
-    result: 'fail',
-    error: `Page not found ${req.path}`,
-  });
-});
-
 app.listen(3000, () => {
-  console.log('Server running at http://localhost:3000');
+  console.log('🚀 Server running at http://localhost:3000');
 });
 
 export default app;
