@@ -1,18 +1,29 @@
-export function check() {
-  const email = document.querySelector('[name="email"]').value;
+import mongoose from "mongoose";
 
-  if (!email) {
-    alert("Please enter your email.");
-    return false;
+const userSchema = new mongoose.Schema(
+  {
+
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+      trim: true,
+    },
+
+    password: {
+      type: String,
+      required: true,
+      minlength: 6,
+      select: false, // agar tidak ikut saat find()
+    },
+
+  },
+  {
+    timestamps: true, // createdAt & updatedAt otomatis
   }
+);
 
-  const password = document.querySelector('[name="password"]').value;
+const User = mongoose.model("User", userSchema);
 
-  if (!password) {
-    alert("Please enter your password.");
-    return false;
-  }
-
-  return true;
-} 
-
+export default User;

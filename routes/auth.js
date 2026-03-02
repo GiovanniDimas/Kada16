@@ -1,41 +1,34 @@
 import express from "express";
 import bcrypt from "bcrypt";
-import User from "../models/User.js";
+import User from "../models/schemas/users.js";
 
-const form = document.getElementById("registerForm");
 const router = express.Router();
 
-form.addEventListener("submit", (e) => {
-  e.preventDefault();
-
-  const email = form.email.value;
-  const password = form.password.value;
-  const confirm = form.confirm.value;
-
-  // Validasi email
-  if (!email.includes("@") || !email.includes(".com")) {
-    alert("Email harus mengandung @ dan .com");
-    return;
-  }
-
-  // Validasi password
-  if (password.length < 8) {
-    alert("Password minimal 8 karakter");
-    return;
-  }
-
-  // Validasi confirm password
-  if (password !== confirm) {
-    alert("Password tidak sama");
-    return;
-  }
-
-  alert("Registrasi berhasil!");
-}); 
-
-router.post("/join", async (req, res, next) => {
+// REGISTER
+export const register = async (req, res, next) => {
   try {
-    const { email, name, password } = req.body;
+    const { email, password } = req.body;
+
+    // validasi kosong
+    if (!email || !password) {
+      return res.status(400).json({
+        error: "Email dan password wajib diisi"
+      });
+    }
+
+    // validasi email
+    if (!email.includes("@") || !email.includes(".com")) {
+      return res.status(400).json({
+        error: "Email harus mengandung @ dan .com"
+      });
+    }
+
+    // validasi password
+    if (password.length < 8) {
+      return res.status(400).json({
+        error: "Password minimal 8 karakter"
+      });
+    }
 
     // cek email
     const exists = await User.findOne({ email });
@@ -46,22 +39,77 @@ router.post("/join", async (req, res, next) => {
     }
 
     // hash password
-    const saltRounds = 10;
-    const pwHash = await bcrypt.hash(password, saltRounds);
+    const pwHash = await bcrypt.hash(password, 10);
 
     // simpan user
     await User.create({
       email,
-      name,
       password: pwHash,
-      confirm: pwHash,
     });
-    
-    res.json({ message: "Register success" });
+
+    res.status(201).json({ message: "Register success" });
 
   } catch (err) {
     next(err);
   }
-});
+};
+
+// LOGIN
+export const login = async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
+
+    // validasi kosong
+    if (!email || !password) {
+      return res.status(400).json({
+        error: "Email dan password wajib diisi"
+      });
+    }
+
+    // validasi email
+    if (!email.includes("@") || !email.includes(".com")) {
+      return res.status(400).json({
+        error: "Email harus mengandung @ dan .com"
+      });
+    }
+
+    // validasi password
+    if (password.length < 8) {
+      return res.status(400).json({
+        error: "Password minimal 8 karakter"
+      });
+    }
+
+    // cek user
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({
+        error: "Email tidak terdaftar"
+      });
+    }
+
+    // cek password
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(400).json({
+        error: "Password salah"
+      });
+    }
+
+    res.json({
+      message: "Login success",
+      user: {
+        id: user._id,
+        email: user.email,
+      }
+    });
+
+  } catch (err) {
+    next(err);
+  }
+};
+
+router.post("/register", register);
+router.post("/login", login);
 
 export default router;
