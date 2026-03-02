@@ -62,7 +62,7 @@ router.post("/", async (req, res, next) => {
 router.put("/:id", async (req, res, next) => {
   
     const { id } = req.params;
-    const { title, content } = req.body;
+    const { author, title, content } = req.body;
     try {
         const updatedNote = await Post.findByIdAndUpdate(id, { author, title, content }, { new: true });
         if (!updatedNote) {
