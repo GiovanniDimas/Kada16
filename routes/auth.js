@@ -7,6 +7,8 @@ const router = express.Router();
 // REGISTER
 export const register = async (req, res, next) => {
   try {
+    console.log("REQ BODY:", req.body);
+
     const { email, password } = req.body;
 
     // validasi kosong
