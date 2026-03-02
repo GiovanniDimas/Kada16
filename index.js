@@ -1,11 +1,14 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
+console.log("ENV LOADED:", process.env.MONGO_URI ? "YES" : "NO");
+
 import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
-import dotenv from 'dotenv';
+
 import notesRouter from './routes/notes.js';
 import authRouter from './routes/auth.js';
-
-dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -16,16 +19,12 @@ let isConnected = false;
 async function connectDb() {
   if (isConnected) return;
 
-  try {
-    await mongoose.connect(MONGO_URI, {
-      serverSelectionTimeoutMS: 5000,
-    });
-    isConnected = true;
-    console.log('✅ MongoDB Connected');
-  } catch (err) {
-    console.error('❌ MongoDB Error:', err.message);
-    throw err;
-  }
+  await mongoose.connect(MONGO_URI, {
+    serverSelectionTimeoutMS: 5000,
+  });
+
+  isConnected = true;
+  console.log("✅ MongoDB Connected");
 }
 
 app.use(async (req, res, next) => {
@@ -34,19 +33,14 @@ app.use(async (req, res, next) => {
     next();
   } catch (err) {
     res.status(500).json({
-      error: 'Database connection failed',
-      message: err.message,
+      error: "Database connection failed",
+      message: err.message
     });
   }
 });
 
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 app.use(cors());
-
-app.get('/', (req, res) => {
-  res.send('🔥 API Running');
-});
 
 app.use('/notes', notesRouter);
 app.use('/auth', authRouter);
