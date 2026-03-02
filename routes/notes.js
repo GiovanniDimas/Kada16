@@ -1,6 +1,6 @@
 import { Router } from "express";
 import * as Note from "../models/note.js";
-import { Post } from "../models/index.js";
+import { Post } from "../models/schema.js";
 
 const router = Router();
 
