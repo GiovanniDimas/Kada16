@@ -1,14 +1,12 @@
 import dotenv from 'dotenv';
-dotenv.config();
-
-console.log("ENV LOADED:", process.env.MONGO_URI ? "YES" : "NO");
-
 import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
-
 import notesRouter from './routes/notes.js';
 import authRouter from './routes/auth.js';
+
+dotenv.config();
+console.log("ENV LOADED:", process.env.MONGO_URI ? "YES" : "NO");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
