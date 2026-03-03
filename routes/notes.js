@@ -1,40 +1,40 @@
 import { Router } from "express";
-import Note from "../models/note.js";
 import { verifyToken } from "../middleware/authMiddleware.js";
+import { Post } from "../models/schema.js"; // Pastikan di schema.js kamu sudah melakukan mongoose.model("Post", PostSchema)
 
 const router = Router();
 
-// ================= GET ALL NOTES =================
+// ================= GET ALL POSTS =================
+// Menampilkan post milik user yang sedang login saja
 router.get("/", verifyToken, async (req, res) => {
   try {
-    const notes = await Note.find({ user: req.user.id });
-    res.json(notes);
+    const posts = await Post.find({}); 
+    res.json(posts);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// ================= GET NOTE BY ID =================
+// ================= GET POST BY ID =================
 router.get("/:id", verifyToken, async (req, res) => {
   try {
-    const note = await Note.findOne({
+    const post = await Post.findOne({
       _id: req.params.id,
-      user: req.user.id,
     });
 
-    if (!note) {
-      return res.status(404).json({ error: "Catatan tidak ditemukan" });
+    if (!post) {
+      return res.status(404).json({ error: "Post tidak ditemukan" });
     }
 
-    res.json(note);
+    res.json(post);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// ================= CREATE NOTE =================
+// ================= CREATE POST =================
 router.post("/", verifyToken, async (req, res) => {
-  const { title, content } = req.body;
+  const { title, content, author } = req.body;
 
   if (!title || !content) {
     return res.status(400).json({
@@ -43,50 +43,50 @@ router.post("/", verifyToken, async (req, res) => {
   }
 
   try {
-    const note = await Note.create({
-      user: req.user.id,
+    const newPost = await Post.create({
+      author,
       title,
       content,
     });
 
-    res.status(201).json(note);
+    res.status(201).json(newPost);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// ================= UPDATE NOTE =================
+// ================= UPDATE POST =================
 router.put("/:id", verifyToken, async (req, res) => {
   try {
-    const updatedNote = await Note.findOneAndUpdate(
-      { _id: req.params.id, user: req.user.id },
+    const updatedPost = await Post.findOneAndUpdate(
+      { _id: req.params.id},
       {
         title: req.body.title,
         content: req.body.content,
+        author: req.body.author,
       },
       { new: true }
     );
 
-    if (!updatedNote) {
-      return res.status(404).json({ error: "Note not found" });
+    if (!updatedPost) {
+      return res.status(404).json({ error: "Post not found or unauthorized" });
     }
 
-    res.json(updatedNote);
+    res.json(updatedPost);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// ================= DELETE NOTE =================
+// ================= DELETE POST =================
 router.delete("/:id", verifyToken, async (req, res) => {
   try {
-    const deletedNote = await Note.findOneAndDelete({
+    const deletedPost = await Post.findOneAndDelete({
       _id: req.params.id,
-      user: req.user.id,
     });
 
-    if (!deletedNote) {
-      return res.status(404).json({ message: "Note not found" });
+    if (!deletedPost) {
+      return res.status(404).json({ message: "Post not found or unauthorized" });
     }
 
     res.json({ message: "Deleted successfully" });

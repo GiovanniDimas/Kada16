@@ -9,6 +9,6 @@ const PostSchema = new Schema(
   {
     timestamps: true,
   }
-);
+);  
 
 export default PostSchema;
