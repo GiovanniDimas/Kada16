@@ -1,3 +1,5 @@
+import mongoose from "mongoose";
+
 let notes = [
   {
     id: 1,
@@ -63,3 +65,26 @@ export const remove = (id) => {
 
   notes = notes.filter((note) => note.id !== id);
 };
+
+const noteSchema = new mongoose.Schema(
+  {
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    title: {
+      type: String,
+      required: true,
+    },
+    content: {
+      type: String,
+      required: true,
+    },
+  },
+  { timestamps: true }
+);
+
+const Note = mongoose.model("Note", noteSchema);
+
+export default Note;

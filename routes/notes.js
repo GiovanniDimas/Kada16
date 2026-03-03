@@ -1,90 +1,98 @@
 import { Router } from "express";
-import * as Note from "../models/note.js";
-import { Post } from "../models/schema.js";
+import Note from "../models/note.js";
+import { verifyToken } from "../middleware/authMiddleware.js";
 
 const router = Router();
 
-router.get("/", async (req, res) => {
+// ================= GET ALL NOTES =================
+router.get("/", verifyToken, async (req, res) => {
   try {
-    const notes = await Post.find();
+    const notes = await Note.find({ user: req.user.id });
     res.json(notes);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-router.get("/:id", async (req, res) => {
+// ================= GET NOTE BY ID =================
+router.get("/:id", verifyToken, async (req, res) => {
   try {
-    const { id } = req.params;
-    const note = await Post.findById(id);
+    const note = await Note.findOne({
+      _id: req.params.id,
+      user: req.user.id,
+    });
 
     if (!note) {
-      return res.status(404).json({
-        error: "Catatan tidak ditemukan",
-        message: `Tidak ada catatan dengan id ${id}`,
-      });
+      return res.status(404).json({ error: "Catatan tidak ditemukan" });
     }
 
-    res.status(200).json(note);
+    res.json(note);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
-  } catch (error) {
-    console.error("Error Detail:", error.message);
-    res.status(500).json({
-      error: "Terjadi kesalahan saat mencari catatan",
-      message: error.message,
+// ================= CREATE NOTE =================
+router.post("/", verifyToken, async (req, res) => {
+  const { title, content } = req.body;
+
+  if (!title || !content) {
+    return res.status(400).json({
+      message: "Title and content are required",
     });
   }
-});
 
-router.post("/", async (req, res, next) => {
-  const {author, title, content } = req.body;
-  
-  if (!author || !title || !content) {
-    return res.status(400).json({
-      message: "Author, title, and content are required",
-    })
-  }
-    
   try {
-  const note = await Post.create({
+    const note = await Note.create({
+      user: req.user.id,
+      title,
+      content,
+    });
 
-    author: author,
-    title: title,
-    content: content,
-  });
-
-  res.status(201).json(note);
-  } catch (e) {
-    next(e);
+    res.status(201).json(note);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 });
 
-router.put("/:id", async (req, res, next) => {
-  
-    const { id } = req.params;
-    const { author, title, content } = req.body;
-    try {
-        const updatedNote = await Post.findByIdAndUpdate(id, { author, title, content }, { new: true });
-        if (!updatedNote) {
-            return res.status(404).json({ error: "Note not found" });
-        }
-        res.json(updatedNote);
-    } catch (err) {
-        next(err);
+// ================= UPDATE NOTE =================
+router.put("/:id", verifyToken, async (req, res) => {
+  try {
+    const updatedNote = await Note.findOneAndUpdate(
+      { _id: req.params.id, user: req.user.id },
+      {
+        title: req.body.title,
+        content: req.body.content,
+      },
+      { new: true }
+    );
+
+    if (!updatedNote) {
+      return res.status(404).json({ error: "Note not found" });
     }
+
+    res.json(updatedNote);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
-router.delete("/:id", async (req, res, next) => {
-    const { id } = req.params;
-    try {
-        const note = await Post.findByIdAndDelete(id);
+// ================= DELETE NOTE =================
+router.delete("/:id", verifyToken, async (req, res) => {
+  try {
+    const deletedNote = await Note.findOneAndDelete({
+      _id: req.params.id,
+      user: req.user.id,
+    });
 
-        if (!note) return res.status(404).json({ message: "Note not found" });
-
-        res.json({ message: "Deleted successfully" });
-    } catch (err) {
-        res.status(400).json({ message: err.message });
+    if (!deletedNote) {
+      return res.status(404).json({ message: "Note not found" });
     }
+
+    res.json({ message: "Deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 export default router;

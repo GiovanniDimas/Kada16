@@ -1,38 +1,27 @@
 import express from "express";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 import User from "../models/schemas/users.js";
 
 const router = express.Router();
 
-// REGISTER
+// ================= REGISTER =================
 export const register = async (req, res, next) => {
   try {
-    console.log("REQ BODY:", req.body);
-
     const { email, password } = req.body;
 
-    // validasi kosong
     if (!email || !password) {
       return res.status(400).json({
         error: "Email dan password wajib diisi"
       });
     }
 
-    // validasi email
-    if (!email.includes("@") || !email.includes(".com")) {
-      return res.status(400).json({
-        error: "Email harus mengandung @ dan .com"
-      });
-    }
-
-    // validasi password
     if (password.length < 8) {
       return res.status(400).json({
         error: "Password minimal 8 karakter"
       });
     }
 
-    // cek email
     const exists = await User.findOne({ email });
     if (exists) {
       return res.status(400).json({
@@ -40,10 +29,8 @@ export const register = async (req, res, next) => {
       });
     }
 
-    // hash password
     const pwHash = await bcrypt.hash(password, 10);
 
-    // simpan user
     await User.create({
       email,
       password: pwHash,
@@ -56,34 +43,17 @@ export const register = async (req, res, next) => {
   }
 };
 
-// LOGIN
+// ================= LOGIN =================
 export const login = async (req, res, next) => {
   try {
-    const email = req.body?.email;
-    const password = req.body?.password;
+    const { email, password } = req.body;
 
-    // validasi kosong
     if (!email || !password) {
       return res.status(400).json({
         error: "Email dan password wajib diisi"
       });
     }
 
-    // validasi email
-    if (!email.includes("@") || !email.includes(".com")) {
-      return res.status(400).json({
-        error: "Email harus mengandung @ dan .com"
-      });
-    }
-
-    // validasi password
-    if (password.length < 8) {
-      return res.status(400).json({
-        error: "Password minimal 8 karakter"
-      });
-    }
-
-    // cek user
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(400).json({
@@ -91,7 +61,6 @@ export const login = async (req, res, next) => {
       });
     }
 
-    // cek password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(400).json({
@@ -99,11 +68,19 @@ export const login = async (req, res, next) => {
       });
     }
 
+    //  GENERATE TOKEN
+    const token = jwt.sign(
+      { id: user._id, email: user.email },
+      process.env.JWT_SECRET,
+      { expiresIn: "1d" }
+    );
+
     res.json({
       message: "Login success",
+      token,
       user: {
         id: user._id,
-        email: user.email,
+        email: user.email
       }
     });
 
