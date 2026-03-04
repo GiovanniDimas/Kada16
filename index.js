@@ -8,6 +8,7 @@ import paymentRoutes from "./routes/payment.js";
 
 dotenv.config();
 console.log("ENV LOADED:", process.env.MONGO_URI ? "YES" : "NO");
+console.log("MIDTRANS KEY:", process.env.MIDTRANS_SERVER_KEY);
 
 const app = express();
 const PORT = process.env.PORT || 3000;
