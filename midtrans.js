@@ -9,4 +9,6 @@ const snap = new midtransClient.Snap({
   clientKey: process.env.MIDTRANS_CLIENT_KEY,
 });
 
+console.log("MIDTRANS KEY:", process.env.MIDTRANS_SERVER_KEY);
+
 export default snap;
