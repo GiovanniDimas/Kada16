@@ -4,6 +4,7 @@ import mongoose from 'mongoose';
 import cors from 'cors';
 import notesRouter from './routes/notes.js';
 import authRouter from './routes/auth.js';
+import paymentRoutes from "./routes/payment.js";
 
 dotenv.config();
 console.log("ENV LOADED:", process.env.MONGO_URI ? "YES" : "NO");
@@ -42,6 +43,7 @@ app.use(cors());
 
 app.use('/notes', notesRouter);
 app.use('/auth', authRouter);
+app.use("/payment", paymentRoutes);
 
 app.listen(PORT, () => {
   console.log(`🚀 Server running at http://localhost:${PORT}`);

@@ -2,6 +2,8 @@ import express from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import User from "../models/schemas/users.js";
+import asyncHandler from "express-async-handler";
+import { sendEmail } from "../services/mail.js";
 
 const router = express.Router();
 
@@ -89,6 +91,43 @@ export const login = async (req, res, next) => {
     next(err);
   }
 };
+
+// Generate password random 8 digit
+function generateRandomPassword() {
+  return Math.floor(Math.random() * 10 ** 8)
+    .toString()
+    .padStart(8, "0");
+}
+
+router.post(
+  "/reset-password",
+  asyncHandler(async (req, res) => {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ error: "Email wajib diisi" });
+    }
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ error: "Email tidak ditemukan" });
+    }
+
+    const randomPassword = generateRandomPassword();
+    const hashedPassword = await bcrypt.hash(randomPassword, 10);
+
+    user.password = hashedPassword;
+    await user.save();
+
+    await sendEmail(
+      email,
+      "Reset Password",
+      `Password baru kamu adalah: ${randomPassword}`
+    );
+
+    res.json({ message: "Password berhasil dikirim ke email" });
+  })
+);
 
 router.post("/register", register);
 router.post("/login", login);
