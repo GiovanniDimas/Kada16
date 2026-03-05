@@ -1,12 +1,14 @@
-import dotenv from 'dotenv';
-import express from 'express';
-import mongoose from 'mongoose';
-import cors from 'cors';
-import notesRouter from './routes/notes.js';
-import authRouter from './routes/auth.js';
+import dotenv from "dotenv";
+import express from "express";
+import mongoose from "mongoose";
+import cors from "cors";
+
+import notesRouter from "./routes/notes.js";
+import authRouter from "./routes/auth.js";
 import paymentRoutes from "./routes/payment.js";
 
 dotenv.config();
+
 console.log("ENV LOADED:", process.env.MONGO_URI ? "YES" : "NO");
 
 const app = express();
@@ -15,6 +17,9 @@ const MONGO_URI = process.env.MONGO_URI;
 
 let isConnected = false;
 
+// ===============================
+// CONNECT DATABASE
+// ===============================
 async function connectDb() {
   if (isConnected) return;
 
@@ -26,6 +31,7 @@ async function connectDb() {
   console.log("✅ MongoDB Connected");
 }
 
+// middleware connect db
 app.use(async (req, res, next) => {
   try {
     await connectDb();
@@ -33,20 +39,40 @@ app.use(async (req, res, next) => {
   } catch (err) {
     res.status(500).json({
       error: "Database connection failed",
-      message: err.message
+      message: err.message,
     });
   }
 });
 
-app.use(cors());
+// ===============================
+// CORS FIX
+// ===============================
+app.use(
+  cors({
+    origin: "*",
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
+
+// handle preflight
 app.options("*", cors());
 
+// ===============================
+// BODY PARSER
+// ===============================
 app.use(express.json());
 
-app.use('/notes', notesRouter);
-app.use('/auth', authRouter);
+// ===============================
+// ROUTES
+// ===============================
+app.use("/notes", notesRouter);
+app.use("/auth", authRouter);
 app.use("/payment", paymentRoutes);
 
+// ===============================
+// START SERVER
+// ===============================
 app.listen(PORT, () => {
   console.log(`🚀 Server running at http://localhost:${PORT}`);
 });
