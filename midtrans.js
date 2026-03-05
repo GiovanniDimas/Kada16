@@ -4,13 +4,13 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const snap = new midtransClient.Snap({
-  isProduction: process.env.MIDTRANS_IS_PRODUCTION === "true", 
+  isProduction: process.env.MIDTRANS_IS_PRODUCTION === "true",
   serverKey: process.env.MIDTRANS_SERVER_KEY,
   clientKey: process.env.MIDTRANS_CLIENT_KEY,
 });
 
-const coreAPI = new midtransClient.coreAPI({
-  isProduction: process.env.MIDTRANS_IS_PRODUCTION === "true", 
+const coreAPI = new midtransClient.CoreApi({
+  isProduction: process.env.MIDTRANS_IS_PRODUCTION === "true",
   serverKey: process.env.MIDTRANS_SERVER_KEY,
   clientKey: process.env.MIDTRANS_CLIENT_KEY,
 });

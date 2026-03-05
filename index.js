@@ -39,24 +39,22 @@ app.use(async (req, res, next) => {
   } catch (err) {
     res.status(500).json({
       error: "Database connection failed",
-      message: err.message,
+      message: err.message
     });
   }
 });
 
 // ===============================
-// CORS FIX
+// CORS
 // ===============================
-app.use(
-  cors({
-    origin: "*",
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-  })
-);
+app.use(cors({
+  origin: "*",
+  methods: ["GET","POST","PUT","DELETE","OPTIONS"],
+  allowedHeaders: ["Content-Type","Authorization"]
+}));
 
-// handle preflight
-app.options("*", cors());
+// FIX ERROR path-to-regexp
+app.options("/*", cors());
 
 // ===============================
 // BODY PARSER

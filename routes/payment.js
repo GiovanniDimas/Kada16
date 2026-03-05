@@ -1,11 +1,11 @@
 import express from "express";
-import snap from "../midtrans.js";
+import { snap } from "../midtrans.js";
 import Order from "../models/order.js";
 
 const router = express.Router();
 
 // ===============================
-// HANDLE PREFLIGHT REQUEST
+// HANDLE PREFLIGHT (CORS FIX)
 // ===============================
 router.options("/create", (req, res) => {
   res.header("Access-Control-Allow-Origin", "*");
@@ -29,7 +29,6 @@ router.post("/create", async (req, res) => {
 
     const orderId = "ORDER-" + Date.now();
 
-    // simpan order ke database
     await Order.create({
       order_id: orderId,
       amount,
@@ -57,6 +56,7 @@ router.post("/create", async (req, res) => {
       token: transaction.token,
       redirect_url: transaction.redirect_url,
     });
+
   } catch (error) {
     res.status(500).json({
       error: "Gagal membuat transaksi",
@@ -66,10 +66,11 @@ router.post("/create", async (req, res) => {
 });
 
 // ===============================
-// HANDLE MIDTRANS NOTIFICATION
+// MIDTRANS NOTIFICATION
 // ===============================
 const handleNotification = async (req, res) => {
   try {
+
     const notification = req.body;
 
     const statusResponse = await snap.transaction.notification(notification);
@@ -77,7 +78,6 @@ const handleNotification = async (req, res) => {
     const orderId = statusResponse.order_id;
     const transactionStatus = statusResponse.transaction_status;
     const fraudStatus = statusResponse.fraud_status;
-    const paymentType = statusResponse.payment_type;
 
     let order = await Order.findOne({ order_id: orderId });
 
@@ -91,11 +91,14 @@ const handleNotification = async (req, res) => {
       if (fraudStatus === "accept") {
         order.status = "paid";
       }
-    } else if (transactionStatus === "settlement") {
+    }
+    else if (transactionStatus === "settlement") {
       order.status = "paid";
-    } else if (transactionStatus === "pending") {
+    }
+    else if (transactionStatus === "pending") {
       order.status = "pending";
-    } else if (
+    }
+    else if (
       transactionStatus === "cancel" ||
       transactionStatus === "deny" ||
       transactionStatus === "expire"
@@ -106,18 +109,20 @@ const handleNotification = async (req, res) => {
     await order.save();
 
     console.log("Order Updated:", orderId, order.status);
-    console.log("Payment Type:", paymentType);
 
     res.status(200).json({
       message: "Notification handled",
-      status: statusResponse,
+      status: statusResponse
     });
+
   } catch (error) {
+
     console.error("Error handleNotification:", error);
 
     res.status(500).json({
-      message: "Error handling notification",
+      message: "Error handling notification"
     });
+
   }
 };
 
@@ -131,6 +136,7 @@ router.post("/notification", handleNotification);
 // ===============================
 router.get("/:order_id", async (req, res) => {
   try {
+
     const order = await Order.findOne({
       order_id: req.params.order_id,
     });
@@ -142,35 +148,12 @@ router.get("/:order_id", async (req, res) => {
     }
 
     res.json(order);
+
   } catch (error) {
     res.status(500).json({
       message: "Server error",
     });
   }
 });
-
-// ===============================
-// MIDTRANS STATUS CHECK
-// ===============================
-export const checkStatus = async (req, res) => {
-  try {
-    const { orderId } = req.params;
-
-    const statusResponse = await snap.transaction.status(orderId);
-
-    res.status(200).json({
-      order_id: statusResponse.order_id,
-      transaction_status: statusResponse.transaction_status,
-      payment_type: statusResponse.payment_type,
-      fraud_status: statusResponse.fraud_status,
-    });
-  } catch (error) {
-    console.error("Error checkStatus:", error);
-
-    res.status(500).json({
-      message: "Gagal cek status transaksi",
-    });
-  }
-};
 
 export default router;
