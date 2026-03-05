@@ -9,6 +9,12 @@ const snap = new midtransClient.Snap({
   clientKey: process.env.MIDTRANS_CLIENT_KEY,
 });
 
+const coreAPI = new midtransClient.coreAPI({
+  isProduction: process.env.MIDTRANS_IS_PRODUCTION === "true", 
+  serverKey: process.env.MIDTRANS_SERVER_KEY,
+  clientKey: process.env.MIDTRANS_CLIENT_KEY,
+});
+
 console.log("MIDTRANS KEY:", process.env.MIDTRANS_SERVER_KEY);
 
-export default snap;
+export { snap, coreAPI };

@@ -5,9 +5,9 @@ import Order from "../models/order.js";
 const router = express.Router();
 
 
-// ===============================
+// =================================
 // CREATE TRANSACTION
-// ===============================
+// =================================
 router.post("/create", async (req, res) => {
   try {
     const { amount, name, email } = req.body;
@@ -20,7 +20,7 @@ router.post("/create", async (req, res) => {
 
     const orderId = "ORDER-" + Date.now();
 
-    // simpan ke database (pending)
+    // simpan order ke database
     await Order.create({
       order_id: orderId,
       amount,
@@ -58,33 +58,45 @@ router.post("/create", async (req, res) => {
 });
 
 
-// ===============================
-// MIDTRANS NOTIFICATION
-// ===============================
-router.post("/notification", async (req, res) => {
+// =================================
+// HANDLE MIDTRANS NOTIFICATION
+// =================================
+const handleNotification = async (req, res) => {
   try {
-    const statusResponse = await snap.transaction.notification(req.body);
+
+    const notification = req.body;
+
+    const statusResponse = await snap.transaction.notification(notification);
 
     const orderId = statusResponse.order_id;
     const transactionStatus = statusResponse.transaction_status;
     const fraudStatus = statusResponse.fraud_status;
+    const paymentType = statusResponse.payment_type;
 
     let order = await Order.findOne({ order_id: orderId });
 
     if (!order) {
-      return res.status(404).json({ message: "Order tidak ditemukan" });
+      return res.status(404).json({
+        message: "Order tidak ditemukan",
+      });
     }
 
-    // logic update status
+    // =================================
+    // LOGIC STATUS PEMBAYARAN
+    // =================================
+
     if (transactionStatus === "capture") {
       if (fraudStatus === "accept") {
+        console.log("Pembayaran berhasil (capture)");
         order.status = "paid";
       }
     } 
     else if (transactionStatus === "settlement") {
+      console.log("Pembayaran berhasil (settlement)");
       order.status = "paid";
     } 
     else if (transactionStatus === "pending") {
+      console.log("Menunggu pembayaran");
       order.status = "pending";
     } 
     else if (
@@ -92,39 +104,89 @@ router.post("/notification", async (req, res) => {
       transactionStatus === "deny" ||
       transactionStatus === "expire"
     ) {
+      console.log("Pembayaran gagal");
       order.status = "failed";
     }
 
     await order.save();
 
     console.log("Order Updated:", orderId, order.status);
+    console.log("Payment Type:", paymentType);
 
-    res.sendStatus(200);
+    // =================================
+    // RESPONSE KE MIDTRANS
+    // =================================
+    res.status(200).json({
+      message: "Notification handled",
+      status: statusResponse
+    });
 
   } catch (error) {
-    console.log("Notification error:", error.message);
-    res.status(500).json({ message: "Notification error" });
+
+    console.error("Error handleNotification:", error);
+
+    res.status(500).json({
+      message: "Error handling notification"
+    });
+
   }
-});
+};
 
 
-// ===============================
+// =================================
+// MIDTRANS WEBHOOK
+// =================================
+router.post("/notification", handleNotification);
+
+
+// =================================
 // CEK STATUS ORDER
-// ===============================
+// =================================
 router.get("/:order_id", async (req, res) => {
   try {
+
     const order = await Order.findOne({
       order_id: req.params.order_id,
     });
 
     if (!order) {
-      return res.status(404).json({ message: "Order tidak ditemukan" });
+      return res.status(404).json({
+        message: "Order tidak ditemukan",
+      });
     }
 
     res.json(order);
+
   } catch (error) {
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({
+      message: "Server error",
+    });
   }
 });
+
+export const checkStatus = async (req, res) => {
+  try {
+
+    const { orderId } = req.params;
+
+    const statusResponse = await snap.transaction.status(orderId);
+
+    res.status(200).json({
+      order_id: statusResponse.order_id,
+      transaction_status: statusResponse.transaction_status,
+      payment_type: statusResponse.payment_type,
+      fraud_status: statusResponse.fraud_status
+    });
+
+  } catch (error) {
+
+    console.error("Error checkStatus:", error);
+
+    res.status(500).json({
+      message: "Gagal cek status transaksi"
+    });
+
+  }
+};
 
 export default router;
