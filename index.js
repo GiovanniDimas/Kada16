@@ -38,8 +38,10 @@ app.use(async (req, res, next) => {
   }
 });
 
-app.use(express.json());
 app.use(cors());
+app.options("*", cors());
+
+app.use(express.json());
 
 app.use('/notes', notesRouter);
 app.use('/auth', authRouter);
