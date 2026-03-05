@@ -53,9 +53,6 @@ app.use(cors({
   allowedHeaders: ["Content-Type","Authorization"]
 }));
 
-// FIX ERROR path-to-regexp
-app.options("/*", cors());
-
 // ===============================
 // BODY PARSER
 // ===============================
