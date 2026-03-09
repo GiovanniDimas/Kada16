@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
-
+import pythonRouter from "./routes/python.js";
 import notesRouter from "./routes/notes.js";
 import authRouter from "./routes/auth.js";
 import paymentRoutes from "./routes/payment.js";
@@ -64,7 +64,7 @@ app.use(express.json());
 app.use("/notes", notesRouter);
 app.use("/auth", authRouter);
 app.use("/payment", paymentRoutes);
-
+app.use("/python", pythonRouter);
 // ===============================
 // START SERVER
 // ===============================
