@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { verifyToken } from "../middleware/authMiddleware.js";
 import { Post } from "../models/schema.js"; // Pastikan di schema.js kamu sudah melakukan mongoose.model("Post", PostSchema)
+import axios from "axios";
 
 const router = Router();
 
@@ -94,5 +95,19 @@ router.delete("/:id", verifyToken, async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
+async function analisaData() {
+  try {
+    const response = await axios.get("http://localhost:5000/analisa-data");
+
+    console.log("Response dari server:");
+    console.log(response.data);
+
+  } catch (error) {
+    console.error("Terjadi error:", error.message);
+  }
+}
+
+analisaData();
 
 export default router;
