@@ -11,4 +11,5 @@ async function analisaData() {
     console.error("Terjadi error:", error.message);
   }
 }
+
 analisaData();
