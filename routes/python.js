@@ -18,4 +18,19 @@ router.get("/analisa-data", async (req, res) => {
   }
 });
 
+router.get("/analisa-nama", async (req, res) => {
+  try {
+    const response = await axios.get("http://localhost:5000/analisa-nama");
+
+    console.log("Response dari server:");
+    console.log(response.data);
+
+    res.send(response.data);
+
+  } catch (error) {
+    console.error("Terjadi error:", error.message);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 export default router;
