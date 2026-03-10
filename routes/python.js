@@ -33,4 +33,19 @@ router.get("/analisa-nama", async (req, res) => {
   }
 });
 
+router.get("/analisa-nama-clone", async (req, res) => {
+  try {
+    const response = await axios.get("http://localhost:5001/analisa-nama-clone");
+
+    console.log("Response dari server:");
+    console.log(response.data);
+
+    res.send(response.data);
+
+  } catch (error) {
+    console.error("Terjadi error:", error.message);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 export default router;
